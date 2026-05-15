@@ -1,0 +1,71 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /survey_definitions/{slug} {
+      allow read: if resource.data.isActive == true || request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly([
+          'slug',
+          'title',
+          'definition',
+          'isActive',
+          'updatedAt'
+        ])
+        && request.resource.data.slug is string
+        && request.resource.data.title is string
+        && request.resource.data.definition is map
+        && request.resource.data.isActive is bool
+        && request.resource.data.updatedAt is string;
+      allow delete: if request.auth != null;
+    }
+
+    match /survey_responses/{responseId} {
+      allow create: if request.resource.data.keys().hasOnly([
+          'id',
+          'surveySlug',
+          'anonId',
+          'startedAt',
+          'submittedAt',
+          'answers',
+          'userAgent',
+          'schemaVersion'
+        ])
+        && request.resource.data.id == responseId
+        && request.resource.data.surveySlug is string
+        && request.resource.data.anonId is string
+            && request.resource.data.startedAt is string
+            && request.resource.data.submittedAt is string
+            && request.resource.data.answers is map
+            && request.resource.data.userAgent is string
+            && request.resource.data.schemaVersion is int;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /survey_response_logs/{logId} {
+      allow create: if request.resource.data.keys().hasOnly([
+          'id',
+          'responseId',
+          'surveySlug',
+          'anonId',
+          'submittedAt',
+          'createdAt',
+          'payloadJson',
+          'errorMessage',
+          'userAgent',
+          'schemaVersion'
+        ])
+        && request.resource.data.id == logId
+        && request.resource.data.responseId is string
+        && request.resource.data.surveySlug is string
+        && request.resource.data.anonId is string
+        && request.resource.data.submittedAt is string
+        && request.resource.data.createdAt is string
+        && request.resource.data.payloadJson is string
+        && request.resource.data.errorMessage is string
+        && request.resource.data.userAgent is string
+        && request.resource.data.schemaVersion is int;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
