@@ -22,7 +22,7 @@ export async function loadRemoteSurveyDefinition(slug = loadSurveyDefinition().s
   if (!db) return local;
 
   try {
-    const snapshot = await getDoc(doc(db, SURVEY_DEFINITION_COLLECTION, slug));
+    const snapshot = await withTimeout(getDoc(doc(db, SURVEY_DEFINITION_COLLECTION, slug)), 4000);
     if (!snapshot.exists()) return local;
     const data = snapshot.data();
     if (!data.isActive || !data.definition) return local;
@@ -30,6 +30,15 @@ export async function loadRemoteSurveyDefinition(slug = loadSurveyDefinition().s
   } catch {
     return local;
   }
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number) {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      window.setTimeout(() => reject(new Error("Timed out while loading survey definition")), ms);
+    }),
+  ]);
 }
 
 export function saveSurveyDefinition(survey: Survey, options: { syncRemote?: boolean } = {}) {

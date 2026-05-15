@@ -17,6 +17,7 @@ export function App() {
   const [path, navigate] = usePath();
   const t = tone[theme];
   const [survey, setSurvey] = useState(() => loadSurveyDefinition());
+  const [surveyReady, setSurveyReady] = useState(false);
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [errors, setErrors] = useState<Record<string, string | null>>({});
@@ -49,7 +50,9 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    void loadRemoteSurveyDefinition().then((next) => setSurvey(next));
+    void loadRemoteSurveyDefinition()
+      .then((next) => setSurvey(next))
+      .finally(() => setSurveyReady(true));
   }, []);
 
   const total = visibleQuestions.length;
@@ -164,6 +167,14 @@ export function App() {
         onOpenSurvey={() => navigate("/")}
         survey={survey}
       />
+    );
+  }
+
+  if (!surveyReady) {
+    return (
+      <main className={cn("grid h-screen place-items-center font-sans antialiased", t.app)}>
+        <div className={cn("rounded-[16px] border px-5 py-4 text-sm", t.border, t.soft, t.textMute)}>설문을 불러오는 중</div>
+      </main>
     );
   }
 
