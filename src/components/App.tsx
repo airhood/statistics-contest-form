@@ -172,14 +172,14 @@ export function App() {
 
   if (!surveyReady) {
     return (
-      <main className={cn("grid h-screen place-items-center font-sans antialiased", t.app)}>
+      <main className={cn("grid min-h-dvh place-items-center font-sans antialiased", t.app)}>
         <div className={cn("rounded-[16px] border px-5 py-4 text-sm", t.border, t.soft, t.textMute)}>설문을 불러오는 중</div>
       </main>
     );
   }
 
   return (
-    <main className={cn("flex h-screen flex-col overflow-hidden font-sans antialiased", t.app)}>
+    <main className={cn("flex h-dvh flex-col overflow-hidden font-sans antialiased", t.app)}>
       <TopBar
         idx={isIntro ? 0 : isDone ? total : idx}
         total={total}
@@ -188,8 +188,8 @@ export function App() {
         t={t}
         onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
       />
-      <section className="relative min-h-0 flex-1 overflow-hidden">
-        <div key={idx} className="h-full">
+      <section className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div key={idx} className="min-h-full">
           {isIntro && <IntroPage survey={survey} t={t} onStart={next} />}
           {current && (
             <QuestionPage

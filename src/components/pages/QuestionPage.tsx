@@ -30,7 +30,7 @@ export function QuestionPage({
   return (
     <section
       className={cn(
-        "mx-auto grid h-full content-center px-7 py-9 max-[640px]:px-[18px]",
+        "mx-auto grid min-h-full content-center px-7 py-9 max-[640px]:px-[18px]",
         wide ? "max-w-[760px]" : "max-w-[620px]",
       )}
     >

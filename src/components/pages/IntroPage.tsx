@@ -4,7 +4,7 @@ import { Icon } from "../icons";
 
 export function IntroPage({ survey, onStart, t }: { survey: Survey; onStart: () => void; t: Tone }) {
   return (
-    <section className="mx-auto grid h-full max-w-[620px] content-center px-7 py-10 max-[640px]:px-[18px]">
+    <section className="mx-auto grid min-h-full max-w-[620px] content-center px-7 py-10 max-[640px]:px-[18px]">
       <h1 className="m-0 text-[38px] font-semibold leading-[1.18] tracking-[-0.025em] text-pretty max-[640px]:text-[28px]">
         {survey.subtitle}
       </h1>

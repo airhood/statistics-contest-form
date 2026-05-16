@@ -23,7 +23,7 @@ export function CompletePage({
   const answered = countAnswered(answers, survey);
 
   return (
-    <section className="mx-auto grid h-full max-w-[620px] content-center px-7 py-10 max-[640px]:px-[18px]">
+    <section className="mx-auto grid min-h-full max-w-[620px] content-center px-7 py-10 max-[640px]:px-[18px]">
       <div className={cn("mb-[22px] inline-flex size-11 items-center justify-center rounded-full", t.accentSoft, t.accent)}>
         <Icon.Check />
       </div>
