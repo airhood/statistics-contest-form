@@ -96,8 +96,14 @@ export function validateSurveyDefinition(value: unknown): Survey {
     if (question.showIf && !questionIds.has(question.showIf.questionId)) {
       throw new Error(`${question.id}의 showIf가 존재하지 않는 문항을 참조합니다.`);
     }
-    if ((question.type === "single" || question.type === "multi" || question.type === "dropdown" || question.type === "ranking") && !Array.isArray(question.options)) {
+    if ((question.type === "single" || question.type === "multi" || question.type === "dropdown") && !Array.isArray(question.options)) {
       throw new Error(`${question.id}에는 options 배열이 필요합니다.`);
+    }
+    if (question.type === "ranking" && !Array.isArray(question.options) && !Array.isArray(question.items)) {
+      throw new Error(`${question.id}에는 options 또는 items 배열이 필요합니다.`);
+    }
+    if (question.items && !question.items.every((item) => item && typeof item.label === "string")) {
+      throw new Error(`${question.id}의 items에는 label이 필요합니다.`);
     }
     if (question.type === "matrix" && (!Array.isArray(question.rows) || !Array.isArray(question.cols))) {
       throw new Error(`${question.id}에는 rows와 cols 배열이 필요합니다.`);

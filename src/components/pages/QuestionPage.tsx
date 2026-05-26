@@ -42,7 +42,7 @@ export function QuestionPage({
         {q.title}
       </h2>
       {q.hint && <p className={cn("mb-0 mt-2 text-[13.5px] leading-[1.55]", t.textMute)}>{q.hint}</p>}
-      <MediaBlock media={q.media} t={t} />
+      <MediaBlock media={q.media ?? (q.body ? { kind: "text", body: q.body } : undefined)} t={t} />
       <div className="mt-6">
         <QuestionRenderer q={q} value={value} onChange={onChange} error={error} t={t} />
       </div>

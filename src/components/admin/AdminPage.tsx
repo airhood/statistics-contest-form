@@ -600,7 +600,7 @@ function BuilderView({ survey, t }: { survey: Survey; t: Tone }) {
               </div>
               <h2 className="m-0 text-[23px] font-semibold leading-[1.32] tracking-[-0.02em]">{q.title}</h2>
               {q.hint && <p className={cn("mt-2 text-[13px] leading-[1.55]", t.textMute)}>{q.hint}</p>}
-              <MediaBlock media={q.media} t={t} />
+              <MediaBlock media={q.media ?? (q.body ? { kind: "text", body: q.body } : undefined)} t={t} />
               <div className="mt-5">
                 <QuestionRenderer q={q} value={answer[q.id]} onChange={(value) => setAnswer((prev) => ({ ...prev, [q.id]: value }))} t={t} />
               </div>

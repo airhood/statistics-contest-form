@@ -485,7 +485,15 @@ function Ranking({
   error?: string | null;
   t: Tone;
 }) {
-  const defaultOrder = useMemo(() => q.options ?? [], [q.options]);
+  const rankingItems = useMemo(
+    () =>
+      q.items?.length
+        ? q.items.map((item) => ({ id: item.id ?? item.label, label: item.label, body: item.body }))
+        : (q.options ?? []).map((option) => ({ id: option, label: option, body: undefined })),
+    [q.items, q.options],
+  );
+  const itemByLabel = useMemo(() => new Map(rankingItems.map((item) => [item.label, item])), [rankingItems]);
+  const defaultOrder = useMemo(() => rankingItems.map((item) => item.label), [rankingItems]);
   const order = value && value.length ? value : defaultOrder;
 
   useEffect(() => {
@@ -504,12 +512,15 @@ function Ranking({
     <div>
       <div className={cn("overflow-hidden rounded-[14px] border", t.border)}>
         {order.map((option, index) => (
-          <div className={cn("flex items-center gap-3 px-3.5 py-3 text-[14.5px]", index === 0 ? "" : "border-t", index === 0 ? "" : t.border)} key={option}>
-            <span className={cn("inline-flex size-7 items-center justify-center rounded-lg font-mono text-[13px] font-semibold", t.muteBg, t.textMute)}>
+          <div className={cn("flex items-start gap-3 px-3.5 py-3 text-[14.5px]", index === 0 ? "" : "border-t", index === 0 ? "" : t.border)} key={option}>
+            <span className={cn("inline-flex size-7 shrink-0 items-center justify-center rounded-lg font-mono text-[13px] font-semibold", t.muteBg, t.textMute)}>
               {index + 1}
             </span>
-            <span className="flex-1">{option}</span>
-            <div className="flex gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="font-medium leading-[1.45]">{option}</div>
+              {itemByLabel.get(option)?.body && <p className={cn("m-0 mt-2 whitespace-pre-wrap text-[13px] leading-[1.65]", t.textMute)}>{itemByLabel.get(option)?.body}</p>}
+            </div>
+            <div className="flex shrink-0 gap-1">
               <button className={cn("inline-flex size-[30px] items-center justify-center rounded-lg border disabled:cursor-not-allowed disabled:opacity-40", t.border, t.textMute)} type="button" aria-label={`${option} 위로 이동`} disabled={index === 0} onClick={() => move(index, -1)}>
                 ⌃
               </button>

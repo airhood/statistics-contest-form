@@ -36,11 +36,13 @@ export type Question = {
   id: string;
   type: QuestionType;
   title: string;
+  body?: string;
   hint?: string;
   required?: boolean;
   placeholder?: string;
   maxLength?: number;
   options?: string[];
+  items?: { id?: string; label: string; body?: string }[];
   scale?: number;
   labels?: string[];
   cols?: string[];
