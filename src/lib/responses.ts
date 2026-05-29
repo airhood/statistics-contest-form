@@ -117,9 +117,7 @@ export async function loadSurveyResponses(surveySlug = loadSurveyDefinition().sl
   try {
     const snapshot = await getDocs(query(collection(db, RESPONSE_COLLECTION), where("surveySlug", "==", surveySlug)));
     const remote = snapshot.docs.map((item) => item.data() as SurveyResponse);
-    const merged = mergeResponses(remote, local);
-    localStorage.setItem(responseKey(surveySlug), JSON.stringify(merged));
-    return merged;
+    return sortResponses(remote);
   } catch (error) {
     console.error("Failed to load survey responses from Firebase", error);
     return local;
@@ -178,7 +176,11 @@ function saveLocalSurveyResponse(response: SurveyResponse) {
 function mergeResponses(primary: SurveyResponse[], secondary: SurveyResponse[]) {
   const byId = new Map<string, SurveyResponse>();
   for (const response of [...primary, ...secondary]) byId.set(response.id, response);
-  return Array.from(byId.values()).sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+  return sortResponses(Array.from(byId.values()));
+}
+
+function sortResponses(responses: SurveyResponse[]) {
+  return [...responses].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
 }
 
 async function saveRemoteSurveyResponse(response: SurveyResponse): Promise<ResponseSaveTarget> {

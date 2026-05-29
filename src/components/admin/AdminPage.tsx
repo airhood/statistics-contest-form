@@ -119,7 +119,7 @@ export function AdminPage({
   onOpenSurvey: () => void;
 }) {
   const [view, setView] = useState<AdminView>("list");
-  const [responses, setResponses] = useState(() => listSurveyResponses(survey.slug));
+  const [responses, setResponses] = useState<SurveyResponse[]>([]);
   const [loadingResponses, setLoadingResponses] = useState(false);
   const [syncingLocal, setSyncingLocal] = useState(false);
   const [clearingResponses, setClearingResponses] = useState(false);
