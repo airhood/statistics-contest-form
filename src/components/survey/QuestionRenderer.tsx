@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn, type Tone } from "../../lib/theme";
 import type { AnswerValue, Question } from "../../lib/types";
 import { Icon } from "../icons";
@@ -495,14 +495,53 @@ function Ranking({
   const itemByLabel = useMemo(() => new Map(rankingItems.map((item) => [item.label, item])), [rankingItems]);
   const defaultOrder = useMemo(() => rankingItems.map((item) => item.label), [rankingItems]);
   const order = value && value.length ? value : defaultOrder;
+  const rowRefs = useRef(new Map<string, HTMLDivElement>());
+  const previousRects = useRef(new Map<string, DOMRect>());
+  const movedOptions = useRef(new Set<string>());
+  const [activeOptions, setActiveOptions] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     if (!value || value.length === 0) onChange(defaultOrder);
   }, [defaultOrder, onChange, value]);
 
+  useLayoutEffect(() => {
+    if (previousRects.current.size === 0) return;
+
+    const active = new Set(movedOptions.current);
+    setActiveOptions(active);
+
+    for (const option of order) {
+      const node = rowRefs.current.get(option);
+      const previous = previousRects.current.get(option);
+      if (!node || !previous) continue;
+
+      const next = node.getBoundingClientRect();
+      const deltaY = previous.top - next.top;
+      if (Math.abs(deltaY) < 1) continue;
+
+      node.animate([{ transform: `translateY(${deltaY}px)` }, { transform: "translateY(0)" }], {
+        duration: 240,
+        easing: "cubic-bezier(0.2, 0, 0, 1)",
+      });
+    }
+
+    previousRects.current = new Map();
+    movedOptions.current = new Set();
+
+    const timeout = window.setTimeout(() => setActiveOptions(new Set()), 280);
+    return () => window.clearTimeout(timeout);
+  }, [order]);
+
   const move = (index: number, delta: number) => {
     const nextIndex = index + delta;
     if (nextIndex < 0 || nextIndex >= order.length) return;
+    previousRects.current = new Map(
+      order.flatMap((option) => {
+        const node = rowRefs.current.get(option);
+        return node ? [[option, node.getBoundingClientRect()] as const] : [];
+      }),
+    );
+    movedOptions.current = new Set([order[index], order[nextIndex]]);
     const next = [...order];
     [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
     onChange(next);
@@ -512,7 +551,19 @@ function Ranking({
     <div>
       <div className={cn("overflow-hidden rounded-[14px] border", t.border)}>
         {order.map((option, index) => (
-          <div className={cn("flex items-start gap-3 px-3.5 py-3 text-[14.5px]", index === 0 ? "" : "border-t", index === 0 ? "" : t.border)} key={option}>
+          <div
+            className={cn(
+              "relative flex items-start gap-3 px-3.5 py-3 text-[14.5px] transition-colors duration-200 will-change-transform",
+              index === 0 ? "" : "border-t",
+              index === 0 ? "" : t.border,
+              activeOptions.has(option) ? t.accentSoft : "",
+            )}
+            key={option}
+            ref={(node) => {
+              if (node) rowRefs.current.set(option, node);
+              else rowRefs.current.delete(option);
+            }}
+          >
             <span className={cn("inline-flex size-7 shrink-0 items-center justify-center rounded-lg font-mono text-[13px] font-semibold", t.muteBg, t.textMute)}>
               {index + 1}
             </span>
