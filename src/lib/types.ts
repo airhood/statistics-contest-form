@@ -28,6 +28,7 @@ export type QuestionType =
 
 export type Media =
   | { kind: "image"; src?: string; label?: string; alt?: string; ratio?: string }
+  | { kind: "imagePair"; items: { src?: string; label: string; alt?: string }[]; ratio?: string }
   | { kind: "audio"; src?: string; label?: string; duration?: string }
   | { kind: "video"; src?: string; label?: string; poster?: string; ratio?: string }
   | { kind: "text"; body: string };

@@ -23,6 +23,28 @@ export function MediaBlock({ media, t }: { media?: Media; t: Tone }) {
     );
   }
 
+  if (media.kind === "imagePair") {
+    return (
+      <div className="mt-[22px] grid grid-cols-2 gap-3 max-[640px]:grid-cols-1">
+        {media.items.map((item, index) => (
+          <div className="min-w-0" key={`${item.label}-${index}`}>
+            <div
+              className={cn("relative flex w-full items-center justify-center overflow-hidden rounded-xl border", item.src ? t.soft : t.mediaStripe, t.border)}
+              style={{ aspectRatio: media.ratio ?? "16 / 9" }}
+            >
+              {item.src ? (
+                <img className="size-full object-contain" src={item.src} alt={item.alt ?? item.label} />
+              ) : (
+                <MediaLabel label={item.label} t={t} />
+              )}
+            </div>
+            <div className={cn("mt-2 font-mono text-[11px] tracking-[0.04em]", t.textSoft)}>{item.label}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (media.kind === "video") {
     return (
       <div className="mt-[22px]">
